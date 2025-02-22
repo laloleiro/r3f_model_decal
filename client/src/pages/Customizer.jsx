@@ -18,6 +18,7 @@ const Customizer = () => {
   const [file, setFile] = useState('');
 
   const [prompt, setPrompt] = useState('');
+  const [csrfToken, setCsrfToken] = useState('');
   const [generatingImg, setGeneratingImg] = useState(false);
 
   const [activeEditorTab, setActiveEditorTab] = useState('')
@@ -47,41 +48,46 @@ const Customizer = () => {
               return null;
       }
   }
-//DALL.E image generation
-  // const handleSubmit = async (type) => {
-  //   if( !prompt ) return alert("Please enter a prompt");
-  //   try{
-  //     setGeneratingImg(true);
 
-  //     const respone = await fetch('http://localhost:8080/api/v1/dalle', {
-  //       method:'POST', 
-  //       headers: {
-  //         'Content-Type': 'application/json'
-  //       },
-  //       body: JSON.stringify({
-  //         prompt, 
-  //       })
-  //     })
-  //     const data = await Response.json();
-  //     handleDecals(type, `data:image/png;base64,${data.photo}`)
-
-  //   }catch (error){
-  //     alert(error);
-  //   }finally{
-  //     setGeneratingImg(false);
-  //     setActiveEditorTab("");
-  //   }
-  // }
+  useEffect(() => {
+    const fetchCsrfToken = async () => {
+      try {
+        const response = await fetch('http://localhost/bananaweb/r3f_model_decal/server/api.php?csrf-token', {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        setCsrfToken(data.csrfToken);
+      } catch (error) {
+        console.error('Error fetching CSRF token:', error);
+      }
+    };
+  
+    fetchCsrfToken();
+  }, []);
 
   const handleSubmit = async (type) => {
     if( !prompt ) return alert("Please enter a prompt");
+  
     try {
       setGeneratingImg(true);
-      const response = await fetch('http://localhost:8080/react3fiber/model_decal/api/generate-image', {
+
+      const response = await fetch('http://localhost/bananaweb/r3f_model_decal/server/api.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-CSRF-Token': csrfToken,
         },
+        credentials:'include',
         body: JSON.stringify({ prompt }),
       });
   
@@ -92,11 +98,8 @@ const Customizer = () => {
       }
   
       const data = await response.json();
-      console.log("LO QUE PASO ");
-      console.log(data.imageUrl);
-      handleDecals(type, ` ${ data.imageUrl }`)
+      handleDecals(type, data.imageUrl)
 
-      //return data.imageUrl;
     } catch (error) {
       console.error('Error generating image:', error);
       throw error;

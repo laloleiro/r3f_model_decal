@@ -1,12 +1,14 @@
 import { Canvas } from "@react-three/fiber";
-import { Center, Environment } from '@react-three/drei'
+import { Center } from '@react-three/drei'
 import CameraRig from "./CameraRig";
 import Modelo3D from "./Modelo3D";
 import Backdrop from './Backdrop';
 
-const CanvasModel = () => {
+const CanvasModel = ( {canvasRef} ) => {
+
   return (
     <Canvas
+    ref={canvasRef}
     shadows
     camera={{position:[0,0,0], fov:25}}
     gl={{preserveDrawingBuffer:true}}

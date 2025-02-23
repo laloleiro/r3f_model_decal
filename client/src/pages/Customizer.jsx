@@ -3,15 +3,13 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { useSnapshot } from 'valtio'
 
 import state from '../store';
-import { download } from '../assets';
-import { downloadCanvasToImage, reader } from '../config/helpers';
 import { EditorTabs, FilterTabs, DecalTypes } from '../config/constants'
 
 import { fadeAnimation, slideAnimation } from '../config/motion';
 import { AIPicker, ColorPicker, CustomButton, FilePicker, Tab } from '../components'
 
 
-const Customizer = () => {
+const Customizer = ({canvasRef}) => {
   const snap = useSnapshot(state);
 
   const [file, setFile] = useState('');
@@ -19,6 +17,8 @@ const Customizer = () => {
   const [prompt, setPrompt] = useState('');
   const [csrfToken, setCsrfToken] = useState('');
   const [generatingImg, setGeneratingImg] = useState(false);
+
+  const [downloading, setDownloading] = useState(false);
   
   const [activeEditorTab, setActiveEditorTab] = useState('')
   const [activeFilterTab, setActiveFilterTab] = useState({
@@ -51,8 +51,8 @@ const Customizer = () => {
   useEffect(() => {
     const fetchCsrfToken = async () => {
       try {
-        //const response = await fetch('http://localhost/bananaweb/r3f_model_decal/server/api.php?csrf-token', {
-        const response = await fetch('https://laloleiro.com/react3fiber/model_decal/server/api.php?csrf-token', {
+        // const response = await fetch('https://laloleiro.com/react3fiber/model_decal/server/api.php?csrf-token', {
+         const response = await fetch('http://localhost/bananaweb/r3f_model_decal/server/api.php?csrf-token', {
           method: 'GET',
           credentials: 'include',
           headers: {
@@ -75,14 +75,27 @@ const Customizer = () => {
     fetchCsrfToken();
   }, []);
 
+
+  const captureCanvas = () => {
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const image = canvas.toDataURL("image/png");
+      // Create a download link
+      const link = document.createElement("a");
+      link.setAttribute('href', image);
+      link.setAttribute('download', 'canvasModel_screenshot.png');
+      link.click();
+    }
+  };
+
   const handleSubmit = async (type) => {
     if( !prompt ) return alert("Please enter a prompt");
   
     try {
       setGeneratingImg(true);
 
-      //const response = await fetch('http://localhost/bananaweb/r3f_model_decal/server/api.php', {
-      const response = await fetch('https://laloleiro.com/react3fiber/model_decal/server/api.php', {
+      // const response = await fetch('https://laloleiro.com/react3fiber/model_decal/server/api.php', {
+      const response = await fetch('http://localhost/bananaweb/r3f_model_decal/server/api.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -128,6 +141,18 @@ const Customizer = () => {
       case "stylishShirt":
           state.isFullTexture = !activeFilterTab[tabName];
         break;
+      case "download":
+        try{
+          setDownloading(true);
+          captureCanvas();
+        }catch (error) {
+          console.error('Error downloading image:', error);
+          throw error;
+        } finally {
+          setDownloading(false);
+        }
+
+      break;
       default:
         state.isLogoTexture = true;
         state.isFullTexture = false;

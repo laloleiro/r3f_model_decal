@@ -1,7 +1,4 @@
 <?php
-
-//header("Access-Control-Allow-Origin: http://localhost:5173");
-//header("Access-Control-Allow-Origin: https://laloleiro.com");
 header("Access-Control-Allow-Origin: " . $_SERVER['HTTP_ORIGIN']);
 
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
@@ -54,6 +51,32 @@ if (empty($prompt)) {
     exit;
 }
 
+// Function to load the .env file
+function loadEnv($filePath) {
+    if (!file_exists($filePath)) {
+        throw new Exception(".env file not found: $filePath");
+    }
+
+    $lines = file($filePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        // Ignore comments (lines starting with #)
+        if (strpos($line, '#') === 0) {
+            continue;
+        }
+
+        // Split the line into key-value pairs
+        list($key, $value) = explode('=', $line, 2);
+        if ($key && $value) {
+            putenv("$key=$value");  // Set the environment variable
+            $_ENV[$key] = $value;   // Optionally store in the $_ENV superglobal
+        }
+    }
+}
+
+    // Load the .env file
+    loadEnv(__DIR__ . '/.env');
+
+
   // Call to Horde AI API (you'll need to implement this)
   $imageUrl = generateImage($prompt);
 
@@ -67,7 +90,12 @@ if (empty($prompt)) {
 
 function generateImage($prompt) {
     $baseUrl = 'https://stablehorde.net/api/v2';
-    $apiKey = 'Qe3cUg4H305RhVPcrmqeVw';
+    $apiKey = getenv('REACT_APP_API_KEY');  // Retrieve the API key from the environment
+    if (!$apiKey) {
+        http_response_code(500);
+        echo json_encode(['error' => 'API key is missing']);
+        exit;
+    }
 
     try {
         // Post async image generation request

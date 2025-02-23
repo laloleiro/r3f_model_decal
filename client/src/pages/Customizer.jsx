@@ -2,7 +2,6 @@ import {useState, useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useSnapshot } from 'valtio'
 
-import config from '../config/config';
 import state from '../store';
 import { download } from '../assets';
 import { downloadCanvasToImage, reader } from '../config/helpers';
@@ -20,7 +19,7 @@ const Customizer = () => {
   const [prompt, setPrompt] = useState('');
   const [csrfToken, setCsrfToken] = useState('');
   const [generatingImg, setGeneratingImg] = useState(false);
-
+  
   const [activeEditorTab, setActiveEditorTab] = useState('')
   const [activeFilterTab, setActiveFilterTab] = useState({
       logoShirt: true,
@@ -52,7 +51,8 @@ const Customizer = () => {
   useEffect(() => {
     const fetchCsrfToken = async () => {
       try {
-        const response = await fetch('http://localhost/bananaweb/r3f_model_decal/server/api.php?csrf-token', {
+        //const response = await fetch('http://localhost/bananaweb/r3f_model_decal/server/api.php?csrf-token', {
+        const response = await fetch('https://laloleiro.com/react3fiber/model_decal/server/api.php?csrf-token', {
           method: 'GET',
           credentials: 'include',
           headers: {
@@ -67,7 +67,7 @@ const Customizer = () => {
         
         const data = await response.json();
         setCsrfToken(data.csrfToken);
-      } catch (error) {
+       } catch (error) {
         console.error('Error fetching CSRF token:', error);
       }
     };
@@ -81,7 +81,8 @@ const Customizer = () => {
     try {
       setGeneratingImg(true);
 
-      const response = await fetch('http://localhost/bananaweb/r3f_model_decal/server/api.php', {
+      //const response = await fetch('http://localhost/bananaweb/r3f_model_decal/server/api.php', {
+      const response = await fetch('https://laloleiro.com/react3fiber/model_decal/server/api.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -93,13 +94,12 @@ const Customizer = () => {
   
       if (!response.ok) {
         const errorData = await response.json();
-        console.log("RESPONSE != OK ");
         throw new Error(errorData.error || 'Failed to generate image');  
       }
   
       const data = await response.json();
       handleDecals(type, data.imageUrl)
-
+      
     } catch (error) {
       console.error('Error generating image:', error);
       throw error;

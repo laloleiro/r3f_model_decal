@@ -1,6 +1,9 @@
 <?php
 
-header("Access-Control-Allow-Origin: http://localhost:5173");
+//header("Access-Control-Allow-Origin: http://localhost:5173");
+//header("Access-Control-Allow-Origin: https://laloleiro.com");
+header("Access-Control-Allow-Origin: " . $_SERVER['HTTP_ORIGIN']);
+
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Access-Control-Allow-Credentials: true");
 header("Access-Control-Allow-Headers: Content-Type, X-Requested-With, X-CSRF-Token");
@@ -27,11 +30,14 @@ if (isset($_GET['csrf-token'])) {
     exit();
 }
 
+$headers = getallheaders();
+error_log("Received Headers: " . print_r($headers, true)); 
 
 // Validate CSRF token for POST requests
-$headers = getallheaders();
+$headers = array_change_key_case(getallheaders(), CASE_LOWER);
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!isset($headers['X-CSRF-Token']) || $headers['X-CSRF-Token'] !== $_SESSION['csrf_token']) {
+    if (!isset($headers['x-csrf-token']) || $headers['x-csrf-token'] !== $_SESSION['csrf_token']) {
         http_response_code(403);
         echo json_encode(['error' => 'Invalid CSRF token']);
         exit;

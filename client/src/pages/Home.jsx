@@ -22,11 +22,11 @@ const Home = () => {
 
                 <motion.div className="home-content" {...headContainerAnimation}>
                     <motion.div {...headTextAnimation}>
-                        <h1 className='head-text'>R3fiber<br className='xl:block hidden'/>AI API</h1>
+                        <h1 className='head-text'>3D<br className='xl:block hidden'/>CRAFT</h1>
                     </motion.div>
                     <motion.div {...headContentAnimation} className='flex flex-col gap-5'>
                         <p className='max-w-md font-normal text-gray-600'>
-                        3D Model customization demo. Image creation with AI Horde API v2 (bit slow, though).<br/>PHP * CORS.
+                        3D model customization: color, logo, texture<br/>Image generation using the AI Horde API v2<br/>react3fiber * PHP * CORS
                         <br/> <br/><strong>Unleash your imagination</strong>{" "} and define your own style.
                         </p>
                         <CustomButton

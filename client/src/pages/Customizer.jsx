@@ -4,7 +4,7 @@ import { useSnapshot } from 'valtio'
 
 import state from '../store';
 import { EditorTabs, FilterTabs, DecalTypes } from '../config/constants'
-
+import { reader } from '../config/helpers';
 import { fadeAnimation, slideAnimation } from '../config/motion';
 import { AIPicker, ColorPicker, CustomButton, FilePicker, Tab } from '../components'
 
@@ -51,8 +51,8 @@ const Customizer = ({canvasRef}) => {
   useEffect(() => {
     const fetchCsrfToken = async () => {
       try {
-        // const response = await fetch('https://laloleiro.com/react3fiber/model_decal/server/api.php?csrf-token', {
-         const response = await fetch('http://localhost/bananaweb/r3f_model_decal/server/api.php?csrf-token', {
+        //  const response = await fetch('http://localhost/bananaweb/r3f_model_decal/server/api.php?csrf-token', {
+          const response = await fetch('https://laloleiro.com/react3fiber/model_decal/server/api.php?csrf-token', {
           method: 'GET',
           credentials: 'include',
           headers: {
@@ -94,8 +94,8 @@ const Customizer = ({canvasRef}) => {
     try {
       setGeneratingImg(true);
 
-      // const response = await fetch('https://laloleiro.com/react3fiber/model_decal/server/api.php', {
-      const response = await fetch('http://localhost/bananaweb/r3f_model_decal/server/api.php', {
+      // const response = await fetch('http://localhost/bananaweb/r3f_model_decal/server/api.php', {
+      const response = await fetch('https://laloleiro.com/react3fiber/model_decal/server/api.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
